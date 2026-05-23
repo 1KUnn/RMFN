@@ -1,0 +1,123 @@
+# QAP-MFN
+
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+ENV/
+env/
+.venv/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Jupyter Notebook
+.ipynb_checkpoints
+*.ipynb
+
+# ============================================
+# Medical Data - MUST BE EXCLUDED
+# ============================================
+
+# Original neuroimaging data
+*.nii.gz
+*.nii
+*.mgz
+*.npy
+*.npz
+*.pkl
+*.pickle
+
+# Data directories
+data/
+datasets/
+raw_data/
+patient/
+control/
+
+# Preprocessed data cache
+cache/
+nilearn_cache/
+preprocessed/
+
+# ============================================
+# Model Outputs - SHOULD NOT BE UPLOADED
+# ============================================
+
+# Trained models
+*.pth
+*.pt
+*.ckpt
+checkpoints/
+
+# Training results
+results/
+logs/
+outputs/
+*.csv
+*.json (except config examples)
+
+# Visualizations
+*.png
+*.jpg
+*.pdf
+figures/
+
+# ============================================
+# Scripts - SPECIFIC FILES EXCLUDED
+# ============================================
+
+# Shell scripts (contain data paths)
+*.sh
+
+# Test scripts
+*quick_test*.py
+
+# Private/personal scripts
+*_private*.py
+*_debug*.py
+run_*.py
+
+# ============================================
+# Environment and Secrets
+# ============================================
+
+.env
+.env.local
+credentials.json
+secrets.json
+*.log
+
+# ============================================
+# Documentation (if contains sensitive info)
+# ============================================
+
+# Personal notes
+*我的*.md
+*笔记*.md
+*private*.md
