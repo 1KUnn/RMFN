@@ -40,7 +40,7 @@ python train/train_simplified.py \
 ```bibtex
 @article{yang2025rmfn,
   title={RMFN: A Reliable Multimodal Fusion Network for Brain Disease Diagnosis},
-  author={Yang, Hong and Huang, Ruiwen and Tan, Wenfeng and Zhang, Peng and Zhang, Yao and Zhang, Yanchun},
+  author={Yang, Hong and Huang, Ruiwen and Zhang, Peng and Zhang, Yao and Zhang, Yanchun},
   journal={Nuclear Physics B},
   year={2025}
 }
