@@ -35,13 +35,6 @@ python train/train_simplified.py \
     --device cuda
 ```
 
-## Data
-
-| Dataset | Description | Link |
-|---|---|---|
-| ABIDE I (Preprocessed) | Autism spectrum disorder, 1,025 subjects | [Link](https://ida.loni.usc.edu/login.jsp) |
-| Taowu | Parkinson's disease, 40 subjects (20 PD + 20 controls) | [Link](https://fcp-indi.s3.amazonaws.com/data/Projects/INDI/umf_pd/taowu.tar.gz) |
-
 ## Citation
 
 ```bibtex
