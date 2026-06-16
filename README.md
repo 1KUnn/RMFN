@@ -1,6 +1,6 @@
-# QAP-MFN
+# RMFN
 
-A multimodal deep learning framework for brain disease classification using structural and functional MRI.
+A Reliable Multimodal Fusion Network for brain disease diagnosis using structural and functional MRI.
 
 ## Installation
 
@@ -14,7 +14,7 @@ pip install -r requirements.txt
 ## Project Structure
 
 ```
-QAP-MFN/
+RMFN/
 ├── model/                   # Model architectures
 │   └── simplified_hp_bfn.py
 ├── data/                    # Data loading
@@ -54,8 +54,8 @@ python train/train_simplified.py \
 ## Citation
 
 ```bibtex
-@article{yang2025qapmfn,
-  title={A Quality-Aware Prompted Multimodal Fusion Network for Brain Disease Diagnosis},
+@article{yang2025rmfn,
+  title={RMFN: A Reliable Multimodal Fusion Network for Brain Disease Diagnosis},
   author={Yang, Hong and Huang, Ruiwen and Tan, Wenfeng and Zhang, Peng and Zhang, Yao and Zhang, Yanchun},
   journal={Nuclear Physics B},
   year={2025}
