@@ -25,19 +25,6 @@ RMFN/
 └── requirements.txt
 ```
 
-## Quick Start
-
-### Data Format
-
-```
-data/
-├── subject_001/
-│   ├── T1w.nii.gz
-│   ├── bold_timeseries.npy
-│   ├── bold_adjacency.npy
-│   └── label.txt
-└── ...
-```
 
 ### Training
 
@@ -45,9 +32,6 @@ data/
 python train/train_simplified.py \
     --data_root ./data \
     --output_dir ./results \
-    --n_rois 100 \
-    --seq_len 200 \
-    --epochs 100 \
     --device cuda
 ```
 

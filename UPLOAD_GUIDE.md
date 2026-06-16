@@ -1,17 +1,17 @@
-# QAP-MFN GitHub Upload Guide
+# RMFN GitHub Upload Guide
 
-This guide helps you upload the QAP-MFN project to GitHub while ensuring medical data privacy compliance.
+This guide helps you upload the RMFN project to GitHub while ensuring medical data privacy compliance.
 
 ## Repository Structure
 
 ```
-QAP-MFN/
+RMFN/
 ├── README.md                       # Project documentation
 ├── LICENSE                         # Apache 2.0 License
 ├── requirements.txt               # Python dependencies
 ├── .gitignore                      # Git ignore rules
 ├── model/
-│   └── simplified_hp_bfn.py       # Core model architecture
+│   └── simplified_hp_bfn.py       # Core model architecture (class RMFN)
 ├── data/
 │   └── multimodal_dataset.py       # Data loading and preprocessing
 ├── train/
@@ -50,18 +50,18 @@ QAP-MFN/
 ### Step 1: Create GitHub Repository
 
 1. Go to https://github.com/new
-2. Repository name: `QAP-MFN`
-3. Description: `Quality-Aware Prompted Multimodal Fusion Network for Brain Disease Diagnosis`
+2. Repository name: `RMFN`
+3. Description: `RMFN: A Reliable Multimodal Fusion Network for Brain Disease Diagnosis`
 4. Select **Public** or **Private**
 5. **DO NOT** initialize with README
 6. Click **Create repository**
 
 ### Step 2: Initialize Local Repository
 
-Navigate to the QAP-MFN folder:
+Navigate to the RMFN folder:
 
 ```bash
-cd e:/work/cursor/QAP-MFN
+cd e:/work/cursor/RMFN
 git init
 ```
 
@@ -76,20 +76,20 @@ git config user.email "your.email@example.com"
 
 ```bash
 git add .
-git commit -m "Initial commit: QAP-MFN model code and documentation"
+git commit -m "Initial commit: RMFN model code and documentation"
 ```
 
 ### Step 5: Set Remote and Push
 
 ```bash
-git remote add origin https://github.com/1KUnn/QAP-MFN.git
+git remote add origin https://github.com/1KUnn/RMFN.git
 git branch -M main
 git push -u origin main
 ```
 
 ### Step 6: Verify Upload
 
-1. Go to https://github.com/1KUnn/QAP-MFN
+1. Go to https://github.com/1KUnn/RMFN
 2. Check that:
    - All core code files are visible
    - Medical data files are NOT present

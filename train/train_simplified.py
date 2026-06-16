@@ -1,10 +1,3 @@
-"""
-Training script for QAP-MFN model.
-
-This script provides end-to-end training pipeline for the Quality-Aware 
-Prompted Multimodal Fusion Network for brain disease diagnosis.
-"""
-
 import os
 import sys
 import time
@@ -17,15 +10,13 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader, random_split
 from sklearn.metrics import accuracy_score, roc_auc_score, f1_score, precision_score, recall_score
 
-# Add parent directory to path for imports
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from data.multimodal_dataset import MultimodalTaowuDataset, custom_collate
-from model.simplified_hp_bfn import SimplifiedHPBFN
+from model.simplified_hp_bfn import RMFN
 
 
 def set_seed(seed=42):
-    """Set random seed for reproducibility."""
     import random
     random.seed(seed)
     np.random.seed(seed)
@@ -34,27 +25,12 @@ def set_seed(seed=42):
 
 
 def train_one_epoch(model, loader, optimizer, device, class_weight=None):
-    """
-    Train the model for one epoch.
-    
-    Args:
-        model: QAP-MFN model
-        loader: Training data loader
-        optimizer: Optimizer
-        device: Device to use
-        class_weight: Optional class weights for imbalanced data
-        
-    Returns:
-        Dictionary of training metrics
-    """
     model.train()
 
     total_loss = 0
     cls_loss_sum = 0
     recon_loss_sum = 0
     ratio_loss_sum = 0
-    fmri_reg_loss_sum = 0
-    consistency_loss_sum = 0
     n_batches = 0
 
     for batch in loader:
@@ -79,11 +55,9 @@ def train_one_epoch(model, loader, optimizer, device, class_weight=None):
             weighted_cls_loss = F.binary_cross_entropy_with_logits(
                 logits, y_for_loss.float(), weight=class_weight[y.long()]
             )
-            loss = (weighted_cls_loss +
-                   0.5 * loss_dict["recon_loss"] +
-                   0.3 * loss_dict["ratio_loss"] +
-                   0.01 * loss_dict["fmri_reg_loss"] +
-                   0.1 * loss_dict["consistency_loss"])
+            loss = (weighted_cls_loss
+                   + 0.5 * loss_dict["recon_loss"]
+                   + 0.3 * loss_dict["ratio_loss"])
             cls_loss_stat = weighted_cls_loss
         else:
             loss = loss_dict["total_loss"]
@@ -97,33 +71,17 @@ def train_one_epoch(model, loader, optimizer, device, class_weight=None):
         cls_loss_sum += cls_loss_stat.item()
         recon_loss_sum += loss_dict["recon_loss"].item()
         ratio_loss_sum += loss_dict["ratio_loss"].item()
-        fmri_reg_loss_sum += loss_dict["fmri_reg_loss"].item()
-        consistency_loss_sum += loss_dict["consistency_loss"].item()
         n_batches += 1
 
     return {
         "loss": total_loss / max(n_batches, 1),
         "cls_loss": cls_loss_sum / max(n_batches, 1),
         "recon_loss": recon_loss_sum / max(n_batches, 1),
-        "ratio_loss": ratio_loss_sum / max(n_batches, 1),
-        "fmri_reg_loss": fmri_reg_loss_sum / max(n_batches, 1),
-        "consistency_loss": consistency_loss_sum / max(n_batches, 1)
+        "ratio_loss": ratio_loss_sum / max(n_batches, 1)
     }
 
 
 def evaluate(model, loader, device, use_iterative=False):
-    """
-    Evaluate the model on validation/test data.
-    
-    Args:
-        model: QAP-MFN model
-        loader: Data loader
-        device: Device to use
-        use_iterative: Whether to use iterative optimization at inference
-        
-    Returns:
-        Dictionary of evaluation metrics
-    """
     model.eval()
     all_probs, all_labels = [], []
 
@@ -173,10 +131,8 @@ def evaluate(model, loader, device, use_iterative=False):
 
 
 def main():
-    """Main training function."""
-    parser = argparse.ArgumentParser(description="QAP-MFN Training")
-    
-    # Data arguments
+    parser = argparse.ArgumentParser(description="RMFN Training")
+
     parser.add_argument("--data_root", type=str, default="./data",
                         help="Path to data directory")
     parser.add_argument("--output_dir", type=str, default="./results",
@@ -184,7 +140,6 @@ def main():
     parser.add_argument("--cache_dir", type=str, default="./cache",
                         help="Directory for cached preprocessed data")
 
-    # Model arguments
     parser.add_argument("--n_rois", type=int, default=100,
                         help="Number of brain ROIs")
     parser.add_argument("--seq_len", type=int, default=200,
@@ -198,7 +153,6 @@ def main():
     parser.add_argument("--t1w_shape", type=int, nargs=3, default=[176, 176, 176],
                         help="Target shape for T1w volumes")
 
-    # Training arguments
     parser.add_argument("--batch_size", type=int, default=1,
                         help="Training batch size")
     parser.add_argument("--epochs", type=int, default=100,
@@ -210,7 +164,6 @@ def main():
     parser.add_argument("--val_ratio", type=float, default=0.3,
                         help="Ratio of data for validation")
 
-    # Other arguments
     parser.add_argument("--seed", type=int, default=42,
                         help="Random seed")
     parser.add_argument("--device", type=str, default="cuda",
@@ -219,7 +172,7 @@ def main():
     args = parser.parse_args()
 
     print("=" * 60)
-    print("QAP-MFN Training")
+    print("RMFN Training")
     print("=" * 60)
     print(f"Device: {args.device}")
 
@@ -230,7 +183,6 @@ def main():
     device = torch.device(args.device if torch.cuda.is_available() else "cpu")
     print(f"Using device: {device}")
 
-    # Load dataset
     print("\nLoading multimodal dataset...")
     dataset = MultimodalTaowuDataset(
         data_root=args.data_root,
@@ -240,7 +192,6 @@ def main():
         minimize_memory=True
     )
 
-    # Split dataset
     n_val = int(len(dataset) * args.val_ratio)
     n_train = len(dataset) - n_val
     train_ds, val_ds = random_split(dataset, [n_train, n_val])
@@ -248,7 +199,6 @@ def main():
     train_loader = DataLoader(train_ds, batch_size=args.batch_size, shuffle=True, collate_fn=custom_collate)
     val_loader = DataLoader(val_ds, batch_size=args.batch_size, shuffle=False, collate_fn=custom_collate)
 
-    # Compute class weights for imbalanced data
     all_labels = [dataset[i]["y"].item() for i in range(len(dataset))]
     class_counts = np.bincount(all_labels)
     class_weight = torch.tensor(len(all_labels) / (2 * class_counts), dtype=torch.float32).to(device)
@@ -259,9 +209,8 @@ def main():
     print(f"  Class distribution: {class_counts}")
     print(f"  Class weights: {class_weight.cpu().numpy()}")
 
-    # Build model
-    print("\nBuilding QAP-MFN model...")
-    model = SimplifiedHPBFN(
+    print("\nBuilding RMFN model...")
+    model = RMFN(
         t1w_shape=tuple(args.t1w_shape),
         n_rois=args.n_rois,
         seq_len=args.seq_len,
@@ -273,7 +222,6 @@ def main():
     n_params = sum(p.numel() for p in model.parameters())
     print(f"Model parameters: {n_params:,}")
 
-    # Setup optimizer and scheduler
     optimizer = torch.optim.AdamW(model.parameters(), lr=args.lr, weight_decay=args.weight_decay)
 
     scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
@@ -283,7 +231,6 @@ def main():
         eta_min=args.lr * 0.01
     )
 
-    # Training loop
     print("\nStarting training...")
     print("-" * 60)
 
@@ -298,12 +245,10 @@ def main():
     for epoch in range(1, args.epochs + 1):
         t0 = time.time()
 
-        # Train
         train_logs = train_one_epoch(
             model, train_loader, optimizer, device, class_weight
         )
 
-        # Evaluate
         val_logs = evaluate(model, val_loader, device, use_iterative=False)
 
         scheduler.step()
@@ -311,19 +256,17 @@ def main():
 
         dt = time.time() - t0
 
-        # Print epoch results
         print(f"Epoch {epoch:03d} | lr={current_lr:.2e} | time={dt:.1f}s")
         print(f"  Train | loss={train_logs['loss']:.4f} | cls={train_logs['cls_loss']:.4f}")
         print(f"  Val   | ACC={val_logs['acc']:.4f} | AUC={val_logs['auc']:.4f} | F1={val_logs['f1']:.4f}")
 
-        # Check for best model
         combined_score = (val_logs['acc'] * 2 + val_logs['auc'] * 2 + val_logs['f1'] + val_logs['precision'] + val_logs['recall']) / 7
         if combined_score > best_score:
             best_score = combined_score
             best_metrics = val_logs.copy()
             best_auc = val_logs['auc']
 
-            best_path = os.path.join(args.output_dir, "qap_mfn_best.pt")
+            best_path = os.path.join(args.output_dir, "rmfn_best.pt")
             torch.save({
                 'model': model.state_dict(),
                 'args': vars(args),
@@ -342,7 +285,6 @@ def main():
             else:
                 auc_patience = 0
 
-        # Early stopping
         if early_stop_count >= patience:
             print(f"\nEarly stopping at epoch {epoch}")
             break
@@ -351,11 +293,10 @@ def main():
             print(f"\nEarly stopping at epoch {epoch} (AUC no improvement)")
             break
 
-    # Final evaluation with iterative optimization
     print("\n" + "=" * 60)
     print("Final evaluation with iterative optimization...")
     print("=" * 60)
-    
+
     model.load_state_dict(torch.load(best_path, weights_only=False)['model'])
     final_metrics = evaluate(model, val_loader, device, use_iterative=True)
 
@@ -367,8 +308,7 @@ def main():
                      final_metrics['precision'] + final_metrics['recall']) / 5
     print(f"   Combined: {combined_final:.4f}")
 
-    # Save final model
-    final_path = os.path.join(args.output_dir, "qap_mfn_final.pt")
+    final_path = os.path.join(args.output_dir, "rmfn_final.pt")
     torch.save({
         'model': model.state_dict(),
         'args': vars(args),
